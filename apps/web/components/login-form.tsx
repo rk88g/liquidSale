@@ -40,7 +40,7 @@ export function LoginForm() {
     <form className="login-form" onSubmit={handleSubmit}>
       <div className="field-group">
         <label className="label" htmlFor="email">
-          Correo electronico
+          Email
         </label>
         <input
           autoComplete="email"
@@ -60,9 +60,7 @@ export function LoginForm() {
           <label className="label" htmlFor="password">
             Password
           </label>
-          <button className="text-button" type="button">
-            Olvide mi password
-          </button>
+          
         </div>
 
         <div className="password-field">
@@ -72,7 +70,7 @@ export function LoginForm() {
             id="password"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="Tu password seguro"
+            placeholder="Tu password"
             required
             type={showPassword ? "text" : "password"}
             value={password}
@@ -88,8 +86,7 @@ export function LoginForm() {
         </div>
 
         <span className="field-hint">
-          Las cuentas reales se administran desde Supabase Auth y los roles se
-          leen desde `liq_profiles`.
+          
         </span>
       </div>
 
