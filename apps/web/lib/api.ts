@@ -21,6 +21,41 @@ type MeResponse = {
   user: UserPayload;
 };
 
+export type ModuleSummary = {
+  id: string;
+  code: string;
+  name: string;
+  slug: string;
+  route: string;
+  icon: string | null;
+  description: string | null;
+  visible_roles: string[];
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+type ModulesResponse = {
+  modules: ModuleSummary[];
+};
+
+type CreateModulePayload = {
+  code: string;
+  name: string;
+  slug: string;
+  route: string;
+  icon?: string;
+  description?: string;
+  visibleRoles: string[];
+  sortOrder?: number;
+  isActive?: boolean;
+};
+
+type CreateModuleResponse = {
+  module: ModuleSummary;
+};
+
 async function safeJson<T>(response: Response): Promise<T | null> {
   try {
     return (await response.json()) as T;
@@ -82,6 +117,55 @@ export async function fetchCurrentUser(accessToken: string): Promise<MeResponse>
 
   if (!data) {
     throw new Error("No se recibio informacion del usuario.");
+  }
+
+  return data;
+}
+
+export async function fetchModules(accessToken: string): Promise<ModulesResponse> {
+  const response = await safeFetch("/api/modules", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorPayload = await safeJson<ApiErrorPayload>(response);
+    throw new Error(errorPayload?.error ?? "No fue posible consultar modulos.");
+  }
+
+  const data = await safeJson<ModulesResponse>(response);
+
+  if (!data) {
+    throw new Error("No se recibio informacion de modulos.");
+  }
+
+  return data;
+}
+
+export async function createModule(
+  accessToken: string,
+  payload: CreateModulePayload,
+): Promise<CreateModuleResponse> {
+  const response = await safeFetch("/api/modules", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorPayload = await safeJson<ApiErrorPayload>(response);
+    throw new Error(errorPayload?.error ?? "No fue posible crear el modulo.");
+  }
+
+  const data = await safeJson<CreateModuleResponse>(response);
+
+  if (!data) {
+    throw new Error("No se recibio el modulo creado.");
   }
 
   return data;

@@ -111,6 +111,13 @@ La base SQL inicial esta en [supabase/001_roles.sql](/C:/Users/rk88g/Documents/G
 
 Nota: ahora todo quedo estandarizado con el prefijo `liq_` para tablas y objetos SQL auxiliares.
 
+La base para dashboard, modulos, tickets y logs esta en [supabase/002_dashboard_core.sql](/C:/Users/rk88g/Documents/GitHub/liquidSale/supabase/002_dashboard_core.sql).
+
+Orden recomendado de migraciones:
+
+1. [supabase/001_roles.sql](/C:/Users/rk88g/Documents/GitHub/liquidSale/supabase/001_roles.sql)
+2. [supabase/002_dashboard_core.sql](/C:/Users/rk88g/Documents/GitHub/liquidSale/supabase/002_dashboard_core.sql)
+
 ## Estructura
 
 ```text
