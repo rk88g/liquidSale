@@ -72,6 +72,11 @@ async function getProfile(
     .maybeSingle();
 
   if (error) {
+    if ("code" in error && error.code === "42P01") {
+      console.warn("liq_profiles no existe todavia. Continuando sin perfil.");
+      return null;
+    }
+
     throw error;
   }
 
