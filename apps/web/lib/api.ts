@@ -1,8 +1,5 @@
 import type { StoredAuth } from "./auth-storage";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ?? "http://localhost:4000";
-
 type LoginPayload = {
   email: string;
   password: string;
@@ -32,8 +29,21 @@ async function safeJson<T>(response: Response): Promise<T | null> {
   }
 }
 
+async function safeFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  try {
+    return await fetch(input, init);
+  } catch {
+    throw new Error(
+      "No fue posible conectar con el servidor. Revisa Vercel, Railway y la URL del backend.",
+    );
+  }
+}
+
 export async function loginRequest(payload: LoginPayload): Promise<LoginResponse> {
-  const response = await fetch(`${API_URL}/auth/login`, {
+  const response = await safeFetch("/api/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,7 +66,7 @@ export async function loginRequest(payload: LoginPayload): Promise<LoginResponse
 }
 
 export async function fetchCurrentUser(accessToken: string): Promise<MeResponse> {
-  const response = await fetch(`${API_URL}/auth/me`, {
+  const response = await safeFetch("/api/auth/me", {
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,
