@@ -62,6 +62,7 @@ Variables principales:
 - `FRONTEND_URL`
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
+- `SUPABASE_PUBLISHABLE_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
 Nota importante: las credenciales de usuarios finales no se guardan en Railway. Railway solo guarda llaves del sistema y configuracion. Los usuarios y passwords viven en Supabase Auth.
@@ -88,7 +89,7 @@ La opcion de `Root Directory: /apps/api` es la mas limpia porque el servicio sol
 Variables minimas para que el login funcione:
 
 - `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
+- `SUPABASE_ANON_KEY` o `SUPABASE_PUBLISHABLE_KEY`
 - `FRONTEND_URL`
 
 Ejemplo de `FRONTEND_URL`:

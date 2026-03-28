@@ -23,13 +23,17 @@ const env = {
   PORT: Number(process.env.PORT ?? 4000),
   FRONTEND_URL: process.env.FRONTEND_URL?.trim() || "http://localhost:3000",
   SUPABASE_URL: process.env.SUPABASE_URL?.trim() || "",
-  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY?.trim() || "",
+  SUPABASE_ANON_KEY:
+    process.env.SUPABASE_ANON_KEY?.trim() ||
+    process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    "",
   SUPABASE_SERVICE_ROLE_KEY:
     process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "",
 };
 
 const corsOrigins = env.FRONTEND_URL.split(",")
   .map((value) => value.trim())
+  .map((value) => value.replace(/\/+$/, ""))
   .filter(Boolean);
 
 function assertAuthEnvironment() {

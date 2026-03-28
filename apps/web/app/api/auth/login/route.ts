@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_API_URL =
-  process.env.BACKEND_API_URL?.replace(/\/$/, "") ||
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  "";
+function normalizeBackendUrl(rawValue: string) {
+  const trimmed = rawValue.trim().replace(/\/+$/, "");
+
+  if (!trimmed) {
+    return "";
+  }
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+}
+
+const BACKEND_API_URL = normalizeBackendUrl(
+  process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || "",
+);
 
 type BackendErrorPayload = {
   error?: string;
