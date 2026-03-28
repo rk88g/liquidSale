@@ -59,6 +59,24 @@ Variables principales:
 
 Nota importante: las credenciales de usuarios finales no se guardan en Railway. Railway solo guarda llaves del sistema y configuracion. Los usuarios y passwords viven en Supabase Auth.
 
+## Configuracion de Railway
+
+Para este monorepo, Railway esta desplegando el backend.
+
+Configuracion recomendada del servicio:
+
+- Root Directory: `/apps/api`
+- Build Command: `npm run build`
+- Start Command: `npm start`
+
+Alternativa si decides dejar el servicio apuntando al repo raiz:
+
+- Root Directory: `/`
+- Build Command: `npm run build`
+- Start Command: `npm start`
+
+La opcion de `Root Directory: /apps/api` es la mas limpia porque el servicio solo construye el backend. Si Railway apunta al repo raiz, ya deje scripts root para que tambien pueda arrancar el API desde el monorepo.
+
 ## Como manejar multiples usuarios y roles
 
 - Los usuarios se crean en Supabase Auth.
