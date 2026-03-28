@@ -319,10 +319,9 @@ async function getAuthenticatedAppUser(request: express.Request) {
 }
 
 function requireAuthenticatedUser(
-  request: express.Request,
   response: express.Response,
   appUser: AuthenticatedAppUser | null,
-) {
+): appUser is AuthenticatedAppUser {
   if (!appUser) {
     response.status(401).json({
       error: "La sesion no es valida.",
@@ -489,7 +488,7 @@ app.get("/auth/me", async (request, response) => {
   try {
     const { user } = await getAuthenticatedAppUser(request);
 
-    if (!requireAuthenticatedUser(request, response, user)) {
+    if (!requireAuthenticatedUser(response, user)) {
       return;
     }
 
@@ -517,7 +516,7 @@ app.get("/modules", async (request, response) => {
   try {
     const { user } = await getAuthenticatedAppUser(request);
 
-    if (!requireAuthenticatedUser(request, response, user)) {
+    if (!requireAuthenticatedUser(response, user)) {
       return;
     }
 
@@ -573,7 +572,7 @@ app.post("/modules", async (request, response) => {
   try {
     const { user } = await getAuthenticatedAppUser(request);
 
-    if (!requireAuthenticatedUser(request, response, user)) {
+    if (!requireAuthenticatedUser(response, user)) {
       return;
     }
 
