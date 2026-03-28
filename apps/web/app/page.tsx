@@ -2,8 +2,8 @@ import { LoginForm } from "../components/login-form";
 
 const pillars = [
   "Acceso multiusuario",
-  "Roles desde Supabase",
-  "Diseno premium y responsivo",
+  "Permisos por rol",
+  "Infraestructura empresarial",
 ];
 
 export default function LoginPage() {
@@ -11,12 +11,13 @@ export default function LoginPage() {
     <main className="page-shell">
       <section className="brand-panel">
         <div className="brand-copy">
-          <span className="eyebrow">Liquid Sale</span>
-          <h1>Un acceso sobrio, moderno y listo para escalar.</h1>
+          <span className="eyebrow">Liquid Sale Enterprise</span>
+          <div className="brand-mark">LIQUID SALE</div>
+          <h1>Acceso sobrio para una operacion moderna.</h1>
           <p className="hero-text">
-            Disenamos la entrada del panel para que se sienta ejecutiva, clara
-            y confiable desde el primer segundo. La autenticacion queda lista
-            para multiples usuarios y roles sobre la misma base de Supabase.
+            Un login limpio, corporativo y preparado para equipos con multiples
+            usuarios, roles y una autenticacion conectada con Supabase,
+            Railway y Vercel.
           </p>
         </div>
 
@@ -34,19 +35,19 @@ export default function LoginPage() {
         <div className="auth-card">
           <div className="auth-header">
             <span className="eyebrow">Acceso privado</span>
-            <h2>Ingresa al dashboard</h2>
+            <h2>Bienvenido de nuevo</h2>
             <p>
-              Usa tu correo corporativo y tu password para entrar al panel de
-              control.
+              Inicia sesion con tu correo corporativo para entrar al dashboard
+              principal.
             </p>
           </div>
 
           <LoginForm />
 
           <div className="auth-meta">
-            <span>Frontend en Vercel</span>
-            <span>Backend en Railway</span>
-            <span>Auth y DB en Supabase</span>
+            <span>Vercel</span>
+            <span>Railway</span>
+            <span>Supabase</span>
           </div>
         </div>
       </section>
