@@ -51,6 +51,7 @@ Configuracion recomendada del proyecto en Vercel:
 - Root Directory: `apps/web`
 - Framework Preset: `Next.js`
 - Build Command: `npm run build`
+- Output Directory: dejar vacio
 
 ### Railway / `apps/api`
 
@@ -82,6 +83,8 @@ Alternativa si decides dejar el servicio apuntando al repo raiz:
 - Start Command: `npm start`
 
 La opcion de `Root Directory: /apps/api` es la mas limpia porque el servicio solo construye el backend. Si Railway apunta al repo raiz, ya deje scripts root para que tambien pueda arrancar el API desde el monorepo.
+
+Si tu proyecto de Vercel sigue apuntando al repo raiz, el archivo [vercel.json](/C:/Users/rk88g/Documents/GitHub/liquidSale/vercel.json#L1) ya fuerza un build de `apps/web` y hace que Vercel busque la salida en `apps/web/.next`.
 
 ## Como manejar multiples usuarios y roles
 
