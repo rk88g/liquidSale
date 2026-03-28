@@ -6,9 +6,12 @@
     "apps/api"
   ],
   "scripts": {
+    "build": "npm run build:api",
+    "start": "npm run start:api",
     "dev:web": "npm run dev --workspace @liquidsale/web",
     "dev:api": "npm run dev --workspace @liquidsale/api",
     "build:web": "npm run build --workspace @liquidsale/web",
-    "build:api": "npm run build --workspace @liquidsale/api"
+    "build:api": "npm run build --workspace @liquidsale/api",
+    "start:api": "npm run start --workspace @liquidsale/api"
   }
 }
