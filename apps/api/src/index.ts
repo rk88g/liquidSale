@@ -33,6 +33,12 @@ const createModuleSchema = z.object({
   route: z.string().min(2, "La ruta es obligatoria."),
   icon: z.string().trim().optional().default(""),
   description: z.string().trim().optional().default(""),
+  sectionKey: z
+    .string()
+    .min(2, "La clave de seccion es obligatoria.")
+    .regex(/^[a-z0-9_]+$/, "La seccion solo admite minusculas, numeros y guion bajo."),
+  sectionName: z.string().min(2, "El nombre de la seccion es obligatorio."),
+  sectionOrder: z.coerce.number().int().default(100),
   visibleRoles: z.array(roleSchema).min(1, "Selecciona al menos un rol."),
   sortOrder: z.coerce.number().int().default(100),
   isActive: z.coerce.boolean().default(true),
@@ -54,6 +60,9 @@ type ModuleRow = {
   route: string;
   icon: string | null;
   description: string | null;
+  section_key: string;
+  section_name: string;
+  section_order: number;
   visible_roles: AppRole[];
   is_active: boolean;
   sort_order: number;
@@ -524,8 +533,10 @@ app.get("/modules", async (request, response) => {
     let query = client
       .from(TABLES.modules)
       .select(
-        "id, code, name, slug, route, icon, description, visible_roles, is_active, sort_order, created_at, updated_at",
+        "id, code, name, slug, route, icon, description, section_key, section_name, section_order, visible_roles, is_active, sort_order, created_at, updated_at",
       )
+      .order("section_order", { ascending: true })
+      .order("section_name", { ascending: true })
       .order("sort_order", { ascending: true })
       .order("name", { ascending: true });
 
@@ -589,6 +600,9 @@ app.post("/modules", async (request, response) => {
       route: parsed.data.route,
       icon: parsed.data.icon || null,
       description: parsed.data.description || null,
+      section_key: parsed.data.sectionKey,
+      section_name: parsed.data.sectionName,
+      section_order: parsed.data.sectionOrder,
       visible_roles: parsed.data.visibleRoles,
       is_active: parsed.data.isActive,
       sort_order: parsed.data.sortOrder,
@@ -600,7 +614,7 @@ app.post("/modules", async (request, response) => {
       .from(TABLES.modules)
       .insert(payload)
       .select(
-        "id, code, name, slug, route, icon, description, visible_roles, is_active, sort_order, created_at, updated_at",
+        "id, code, name, slug, route, icon, description, section_key, section_name, section_order, visible_roles, is_active, sort_order, created_at, updated_at",
       )
       .single();
 

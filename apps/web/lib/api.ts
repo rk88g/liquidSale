@@ -29,6 +29,9 @@ export type ModuleSummary = {
   route: string;
   icon: string | null;
   description: string | null;
+  section_key: string;
+  section_name: string;
+  section_order: number;
   visible_roles: string[];
   is_active: boolean;
   sort_order: number;
@@ -47,6 +50,9 @@ type CreateModulePayload = {
   route: string;
   icon?: string;
   description?: string;
+  sectionKey: string;
+  sectionName: string;
+  sectionOrder?: number;
   visibleRoles: string[];
   sortOrder?: number;
   isActive?: boolean;
