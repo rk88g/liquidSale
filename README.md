@@ -46,6 +46,12 @@ Variable principal:
 
 - `NEXT_PUBLIC_API_URL`: URL publica del backend en Railway
 
+Configuracion recomendada del proyecto en Vercel:
+
+- Root Directory: `apps/web`
+- Framework Preset: `Next.js`
+- Build Command: `npm run build`
+
 ### Railway / `apps/api`
 
 Revisar [apps/api/.env.example](/C:/Users/rk88g/Documents/GitHub/liquidSale/apps/api/.env.example)
