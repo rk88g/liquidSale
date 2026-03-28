@@ -596,6 +596,19 @@ input {
   gap: 8px;
 }
 
+.workspace-nav-group {
+  display: grid;
+  gap: 8px;
+}
+
+.workspace-nav-label {
+  padding: 8px 4px 2px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
 .workspace-nav-item,
 .workspace-logout {
   min-height: 48px;
@@ -660,9 +673,65 @@ input {
   gap: 16px;
 }
 
+.workspace-column {
+  display: grid;
+  gap: 16px;
+}
+
 .workspace-panel {
   border-radius: 24px;
   padding: 20px;
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.section-card {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.section-card-top,
+.section-module-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-card-top {
+  margin-bottom: 14px;
+}
+
+.section-card-top strong,
+.section-module-row span {
+  display: block;
+  font-weight: 600;
+}
+
+.section-card-top span,
+.section-module-row small {
+  color: var(--muted);
+}
+
+.section-module-list {
+  display: grid;
+  gap: 10px;
+}
+
+.section-module-row {
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.section-module-row:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 
 .modules-table-wrap {
@@ -762,6 +831,10 @@ input {
   }
 
   .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-grid {
     grid-template-columns: 1fr;
   }
 }
