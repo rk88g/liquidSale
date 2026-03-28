@@ -9,6 +9,7 @@ export function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
@@ -47,7 +48,7 @@ export function LoginForm() {
           id="email"
           name="email"
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="admin@liquidsale.com"
+          placeholder="usuario@empresa.com"
           required
           type="email"
           value={email}
@@ -55,20 +56,37 @@ export function LoginForm() {
       </div>
 
       <div className="field-group">
-        <label className="label" htmlFor="password">
-          Password
-        </label>
-        <input
-          autoComplete="current-password"
-          className="field"
-          id="password"
-          name="password"
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Tu password seguro"
-          required
-          type="password"
-          value={password}
-        />
+        <div className="field-row">
+          <label className="label" htmlFor="password">
+            Password
+          </label>
+          <button className="text-button" type="button">
+            Olvide mi password
+          </button>
+        </div>
+
+        <div className="password-field">
+          <input
+            autoComplete="current-password"
+            className="field"
+            id="password"
+            name="password"
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Tu password seguro"
+            required
+            type={showPassword ? "text" : "password"}
+            value={password}
+          />
+          <button
+            aria-label={showPassword ? "Ocultar password" : "Mostrar password"}
+            className="password-toggle"
+            onClick={() => setShowPassword((current) => !current)}
+            type="button"
+          >
+            {showPassword ? "Ocultar" : "Mostrar"}
+          </button>
+        </div>
+
         <span className="field-hint">
           Las cuentas reales se administran desde Supabase Auth y los roles se
           leen desde `liq_profiles`.
