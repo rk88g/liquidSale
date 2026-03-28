@@ -9,7 +9,9 @@ const pillars = [
 export default function LoginPage() {
   return (
     <main className="page-shell">
-      
+      <section className="brand-panel">
+        
+      </section>
 
       <section className="auth-panel">
         <div className="auth-card">

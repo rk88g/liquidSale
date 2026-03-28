@@ -23,6 +23,14 @@ type BackendErrorPayload = {
   message?: string;
 };
 
+async function safeText(response: Response): Promise<string> {
+  try {
+    return await response.text();
+  } catch {
+    return "";
+  }
+}
+
 async function safeJson<T>(response: Response): Promise<T | null> {
   try {
     return (await response.json()) as T;
@@ -56,16 +64,28 @@ export async function GET(request: NextRequest) {
       cache: "no-store",
     });
 
+    const clonedResponse = response.clone();
     const payload = await safeJson<BackendErrorPayload | Record<string, unknown>>(
       response,
     );
+    const rawText = !payload ? await safeText(clonedResponse) : "";
 
     if (!response.ok) {
+      const errorMessage =
+        (payload as BackendErrorPayload | null)?.error ||
+        (payload as BackendErrorPayload | null)?.message ||
+        rawText ||
+        "No fue posible validar la sesion.";
+
+      console.error("Me proxy error", {
+        status: response.status,
+        backendUrl,
+        errorMessage,
+      });
+
       return NextResponse.json(
         {
-          error:
-            (payload as BackendErrorPayload | null)?.error ??
-            "No fue posible validar la sesion.",
+          error: errorMessage,
         },
         { status: response.status },
       );
@@ -77,6 +97,8 @@ export async function GET(request: NextRequest) {
       error instanceof Error
         ? error.message
         : "No fue posible conectar con el backend.";
+
+    console.error("Me proxy exception", message);
 
     return NextResponse.json(
       {

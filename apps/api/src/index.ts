@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import cors from "cors";
 import express from "express";
 import { createClient } from "@supabase/supabase-js";
@@ -22,6 +23,8 @@ const TABLES = {
 const env = {
   PORT: Number(process.env.PORT ?? 4000),
   FRONTEND_URL: process.env.FRONTEND_URL?.trim() || "http://localhost:3000",
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL?.trim().toLowerCase() || "",
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD?.trim() || "",
   SUPABASE_URL: process.env.SUPABASE_URL?.trim() || "",
   SUPABASE_ANON_KEY:
     process.env.SUPABASE_ANON_KEY?.trim() ||
@@ -35,6 +38,8 @@ const corsOrigins = env.FRONTEND_URL.split(",")
   .map((value) => value.trim())
   .map((value) => value.replace(/\/+$/, ""))
   .filter(Boolean);
+
+const LOCAL_ADMIN_TOKEN_PREFIX = "local-admin";
 
 function assertAuthEnvironment() {
   const missing: string[] = [];
@@ -107,6 +112,76 @@ function buildUserPayload(
   };
 }
 
+function getLocalAdminSignature(email: string) {
+  return createHmac("sha256", env.ADMIN_PASSWORD).update(email).digest("hex");
+}
+
+function buildLocalAdminToken(email: string) {
+  const encodedEmail = Buffer.from(email).toString("base64url");
+  const signature = getLocalAdminSignature(email);
+  return `${LOCAL_ADMIN_TOKEN_PREFIX}.${encodedEmail}.${signature}`;
+}
+
+function buildLocalAdminResponse(email: string) {
+  return {
+    session: {
+      accessToken: buildLocalAdminToken(email),
+      refreshToken: "",
+      expiresAt: Math.floor(Date.now() / 1000) + 60 * 60 * 12,
+    },
+    user: {
+      id: "local-admin",
+      email,
+      fullName: "Administrador",
+      role: "super_admin",
+    },
+  };
+}
+
+function isLocalAdminLogin(email: string, password: string) {
+  return (
+    !!env.ADMIN_EMAIL &&
+    !!env.ADMIN_PASSWORD &&
+    email.trim().toLowerCase() === env.ADMIN_EMAIL &&
+    password === env.ADMIN_PASSWORD
+  );
+}
+
+function getLocalAdminUserFromToken(token: string) {
+  if (!env.ADMIN_EMAIL || !env.ADMIN_PASSWORD) {
+    return null;
+  }
+
+  const [prefix, encodedEmail, signature] = token.split(".");
+
+  if (!prefix || !encodedEmail || !signature) {
+    return null;
+  }
+
+  if (prefix !== LOCAL_ADMIN_TOKEN_PREFIX) {
+    return null;
+  }
+
+  const email = Buffer.from(encodedEmail, "base64url").toString("utf8");
+  const expectedSignature = getLocalAdminSignature(email);
+  const provided = Buffer.from(signature);
+  const expected = Buffer.from(expectedSignature);
+
+  if (provided.length !== expected.length) {
+    return null;
+  }
+
+  if (!timingSafeEqual(provided, expected)) {
+    return null;
+  }
+
+  if (email.trim().toLowerCase() !== env.ADMIN_EMAIL) {
+    return null;
+  }
+
+  return buildLocalAdminResponse(email).user;
+}
+
 const app = express();
 
 app.use(
@@ -143,10 +218,22 @@ app.post("/auth/login", async (request, response) => {
   }
 
   try {
+    if (isLocalAdminLogin(parsed.data.email, parsed.data.password)) {
+      response.json(buildLocalAdminResponse(parsed.data.email.trim().toLowerCase()));
+      return;
+    }
+
     const client = createAuthClient();
     const { data, error } = await client.auth.signInWithPassword(parsed.data);
 
     if (error || !data.user || !data.session) {
+      console.error("Supabase login failed", {
+        email: parsed.data.email,
+        message: error?.message ?? "No session returned",
+        status: error?.status,
+        name: error?.name,
+      });
+
       response.status(401).json({
         error: error?.message ?? "No fue posible autenticar al usuario.",
       });
@@ -194,6 +281,15 @@ app.get("/auth/me", async (request, response) => {
   }
 
   try {
+    const localAdminUser = getLocalAdminUserFromToken(token);
+
+    if (localAdminUser) {
+      response.json({
+        user: localAdminUser,
+      });
+      return;
+    }
+
     const client = createAuthClient();
     const {
       data: { user },
@@ -242,6 +338,7 @@ process.on("unhandledRejection", (reason) => {
 app.listen(env.PORT, () => {
   console.log(`Liquid Sale API running on port ${env.PORT}`);
   console.log(`Allowed frontend origins: ${corsOrigins.join(", ") || "any"}`);
+  console.log(`Local admin configured: ${env.ADMIN_EMAIL && env.ADMIN_PASSWORD ? "yes" : "no"}`);
   console.log(
     `Supabase auth configured: ${env.SUPABASE_URL && env.SUPABASE_ANON_KEY ? "yes" : "no"}`,
   );
