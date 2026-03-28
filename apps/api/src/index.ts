@@ -4,16 +4,6 @@ import express from "express";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
-const envSchema = z.object({
-  PORT: z.coerce.number().default(4000),
-  FRONTEND_URL: z.string().url().default("http://localhost:3000"),
-  SUPABASE_URL: z.string().url(),
-  SUPABASE_ANON_KEY: z.string().min(1),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
-});
-
-const env = envSchema.parse(process.env);
-
 const loginSchema = z.object({
   email: z.string().email("Captura un correo valido."),
   password: z.string().min(8, "La password debe tener al menos 8 caracteres."),
@@ -29,7 +19,40 @@ const TABLES = {
   profiles: "liq_profiles",
 } as const;
 
+const env = {
+  PORT: Number(process.env.PORT ?? 4000),
+  FRONTEND_URL: process.env.FRONTEND_URL?.trim() || "http://localhost:3000",
+  SUPABASE_URL: process.env.SUPABASE_URL?.trim() || "",
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY?.trim() || "",
+  SUPABASE_SERVICE_ROLE_KEY:
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "",
+};
+
+const corsOrigins = env.FRONTEND_URL.split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+function assertAuthEnvironment() {
+  const missing: string[] = [];
+
+  if (!env.SUPABASE_URL) {
+    missing.push("SUPABASE_URL");
+  }
+
+  if (!env.SUPABASE_ANON_KEY) {
+    missing.push("SUPABASE_ANON_KEY");
+  }
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Faltan variables del backend: ${missing.join(", ")}. Configuralas en Railway.`,
+    );
+  }
+}
+
 function createAuthClient() {
+  assertAuthEnvironment();
+
   return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
     auth: {
       autoRefreshToken: false,
@@ -79,11 +102,19 @@ const app = express();
 
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: corsOrigins.length > 0 ? corsOrigins : true,
     credentials: true,
   }),
 );
 app.use(express.json());
+
+app.get("/", (_request, response) => {
+  response.json({
+    ok: true,
+    service: "liquid-sale-api",
+    status: "online",
+  });
+});
 
 app.get("/health", (_request, response) => {
   response.json({
@@ -191,6 +222,18 @@ app.get("/auth/me", async (request, response) => {
   }
 });
 
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception", error);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled rejection", reason);
+});
+
 app.listen(env.PORT, () => {
   console.log(`Liquid Sale API running on port ${env.PORT}`);
+  console.log(`Allowed frontend origins: ${corsOrigins.join(", ") || "any"}`);
+  console.log(
+    `Supabase auth configured: ${env.SUPABASE_URL && env.SUPABASE_ANON_KEY ? "yes" : "no"}`,
+  );
 });

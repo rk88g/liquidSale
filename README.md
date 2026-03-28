@@ -75,6 +75,7 @@ Configuracion recomendada del servicio:
 - Root Directory: `/apps/api`
 - Build Command: `npm run build`
 - Start Command: `npm start`
+- Healthcheck Path: `/health`
 
 Alternativa si decides dejar el servicio apuntando al repo raiz:
 
@@ -83,6 +84,18 @@ Alternativa si decides dejar el servicio apuntando al repo raiz:
 - Start Command: `npm start`
 
 La opcion de `Root Directory: /apps/api` es la mas limpia porque el servicio solo construye el backend. Si Railway apunta al repo raiz, ya deje scripts root para que tambien pueda arrancar el API desde el monorepo.
+
+Variables minimas para que el login funcione:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `FRONTEND_URL`
+
+Ejemplo de `FRONTEND_URL`:
+
+- `https://tu-proyecto.vercel.app`
+
+Nota: el backend ahora puede iniciar aunque falten variables de Supabase, para que Railway no crashee al arrancar. Si faltan, el servicio levantara y `/health` respondera, pero las rutas `/auth/login` y `/auth/me` devolveran un error claro hasta que configures esas variables.
 
 Si tu proyecto de Vercel sigue apuntando al repo raiz, el archivo [vercel.json](/C:/Users/rk88g/Documents/GitHub/liquidSale/vercel.json#L1) ya fuerza un build de `apps/web` y hace que Vercel busque la salida en `apps/web/.next`.
 
